@@ -5,26 +5,31 @@ from pathlib import Path
 
 class application:
 
-    def __init__(self,destination) -> None:
+    def __init__(self) -> None:
         self.extensions = ('.dng', '.raw', '.cr2', '.crw', '.erf', '.raf', '.tif', '.kdc', '.dcr', '.mos',
                                     '.mef', '.nef', '.orf', '.rw2', '.pef', '.x3f', '.srw', '.srf', '.sr2', '.arw',
-                                    '.mdc', '.mrw')
+                                    '.mdc', '.mrw', '.jpg', '.png')
         self.face_cascade = cv2.CascadeClassifier("E:\project\FOrg\haarcascade\haarcascade_frontalface_alt.xml")
+        self.tag = {}
 
+    def checkTagExist(self,exifTagName):
+        try:
+            return(self.tags[exifTagName])
+        except:
+            return  
 
     def createDatabase(self,dir):
         Database = {}
         for root, dirs, files in os.walk(dir):
             for file in files:
-                if file.endswith(self.extenstions):
+                if file.endswith(self.extensions):
                     location = f"{root}\\{file}"
                     f = open(location, 'rb')
-                    tags = exifread.process_file(f)
-
+                    self.tags = exifread.process_file(f)
                     Database[file] = {
                         "root" : location,
                         "ext"  : Path(file).suffix,
-                        "Model" :  ("%s" % tags["Image Model"]),
+                        "Model" :  if tags["Image Model"] ("%s" % tags["Image Model"]),
                         "FocalLength": ("%s" % tags["EXIF FocalLength"]),
                         "ISO": ("%s" % tags["EXIF ISOSpeedRatings"]),
                         "Fstop": ("%s" % tags["EXIF FNumber"]),
@@ -34,7 +39,7 @@ class application:
                     f.close()
         return Database
     
-    def checkPotrait(self,destition):
+    def checkPotrait(self,destition,):
         img = cv2.imread(destition)
         scale_percent = 20
         dim = (int (img.shape[1]*scale_percent/100),int (img.shape[0]*scale_percent/100))
@@ -43,9 +48,9 @@ class application:
         faces = self.face_cascade.detectMultiScale(gray,1.1,4)
         numface = len(faces)
         if numface == 0:
-            return False
+            return "Potrait"
         else:
-            return True
+            return "Landscape"
 
     def view_preview(self,address):
         with rawpy.imread(address) as raw:
@@ -75,10 +80,11 @@ class application:
         
 def main(argv=None):
     tic = time.perf_counter()
-    dir = r"E:\project"
-    database = createDatabase(dir)
+    dir = r"E:\testfile"
+    app = application()
+    database = app.createDatabase(dir)
     print("There are total %d files" % len(database))
-    process_photo(database, "Model",r"E:\project\lol")
+    app.process_photo(database, "Portrait",r"E:\project\lol")
     toc = time.perf_counter()
     print(f"Time used: {toc - tic:0.4f} seconds")
 
