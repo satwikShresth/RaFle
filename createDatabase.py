@@ -29,10 +29,23 @@ class application:
                         "ISO": ("%s" % tags["EXIF ISOSpeedRatings"]),
                         "Fstop": ("%s" % tags["EXIF FNumber"]),
                         "Date & Time": ("%s" % tags["EXIF DateTimeDigitized"]),
-                        "Potrait": self.
+                        "Potrait": self.checkPotrait(location)
                         }
                     f.close()
         return Database
+    
+    def checkPotrait(self,destition):
+        img = cv2.imread(destition)
+        scale_percent = 20
+        dim = (int (img.shape[1]*scale_percent/100),int (img.shape[0]*scale_percent/100))
+        rimage = cv2.resize(img,dim,interpolation= cv2.INTER_AREA)
+        gray = cv2.cvtColor(rimage,cv2.COLOR_BGR2GRAY)
+        faces = self.face_cascade.detectMultiScale(gray,1.1,4)
+        numface = len(faces)
+        if numface == 0:
+            return False
+        else:
+            return True
 
     def view_preview(self,address):
         with rawpy.imread(address) as raw:

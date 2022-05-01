@@ -27,8 +27,3 @@ for photo in photos:
                 os.makedirs(r"E:\project\FOrg\lol")    
             shutil.move(photopath,(r'E:\project\FOrg\lol\%s' % photo))
         i += 1
-
-
-def checkPotrait(destition,target):
-    
-
