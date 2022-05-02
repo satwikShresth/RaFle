@@ -1,0 +1,26 @@
+def checkTagExist(self,exifTagName):
+    try:
+        return(self.tags[exifTagName])
+    except:
+        return  
+        
+def createDatabase(self,dir):
+    Database = {}
+    for root, dirs, files in os.walk(dir):
+        for file in files:
+            if file.endswith(self.extensions):
+                location = f"{root}\\{file}"
+                f = open(location, 'rb')
+                self.tags = exifread.process_file(f)
+                Database[file] = {
+                    "root" : location,
+                    "ext"  : Path(file).suffix,
+                    "Model" :  if tags["Image Model"] ("%s" % tags["Image Model"]),
+                    "FocalLength": ("%s" % tags["EXIF FocalLength"]),
+                    "ISO": ("%s" % tags["EXIF ISOSpeedRatings"]),
+                    "Fstop": ("%s" % tags["EXIF FNumber"]),
+                    "Date & Time": ("%s" % tags["EXIF DateTimeDigitized"]),
+                    "Potrait": self.checkPotrait(location)
+                    }
+                f.close()
+        return Database
